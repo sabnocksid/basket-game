@@ -1,100 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Catch the Falling Objects</title>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        canvas {
-            border: 2px solid black;
-            display: block;
-            margin: 20px auto;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch the Falling Objects</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
 </head>
 <body>
-    <h1>Catch the Falling Objects</h1>
-    <p>Use the Left and Right arrow keys to move the basket!</p>
-    <canvas id="gameCanvas" width="600" height="400"></canvas>
-    <py-script>
-        from js import document, window
-
-        canvas = document.getElementById("gameCanvas")
-        ctx = canvas.getContext("2d")
-
-        # Game variables
-        basket_x = canvas.width // 2 - 40
-        basket_y = canvas.height - 20
-        basket_width = 80
-        basket_height = 10
-        basket_speed = 5
-        falling_x = 50
-        falling_y = 0
-        falling_size = 20
-        falling_speed = 2
-        score = 0
-
-        def draw_basket():
-            ctx.fillStyle = "blue"
-            ctx.fillRect(basket_x, basket_y, basket_width, basket_height)
-
-        def draw_falling_object():
-            ctx.fillStyle = "red"
-            ctx.beginPath()
-            ctx.arc(falling_x, falling_y, falling_size, 0, 2 * 3.14159)
-            ctx.fill()
-
-        def update_game():
-            global falling_y, falling_x, basket_x, score
-
-            # Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-            # Draw basket and falling object
-            draw_basket()
-            draw_falling_object()
-
-            # Move falling object
-            falling_y += falling_speed
-
-            # Check for collision
-            if (
-                falling_y + falling_size >= basket_y
-                and basket_x <= falling_x <= basket_x + basket_width
-            ):
-                score += 1
-                falling_y = 0
-                falling_x = window.Math.random() * (canvas.width - falling_size)
-
-            # Reset if missed
-            if falling_y > canvas.height:
-                falling_y = 0
-                falling_x = window.Math.random() * (canvas.width - falling_size)
-
-            # Display score
-            ctx.fillStyle = "black"
-            ctx.font = "20px Arial"
-            ctx.fillText(f"Score: {score}", 10, 20)
-
-            # Schedule next update
-            window.requestAnimationFrame(update_game)
-
-        # Listen for arrow key presses
-        def on_keydown(event):
-            global basket_x
-            if event.key == "ArrowLeft" and basket_x > 0:
-                basket_x -= basket_speed
-            elif event.key == "ArrowRight" and basket_x < canvas.width - basket_width:
-                basket_x += basket_speed
-
-        document.addEventListener("keydown", on_keydown)
-
-        # Start the game loop
-        update_game()
-    </py-script>
+  <h1>Catch the Falling Objects</h1>
+  <p>Use the Left and Right arrow keys to move the basket!</p>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+  <script src="script.js"></script>
 </body>
 </html>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Basket variables
+let basketX = canvas.width / 2 - 40;
+const basketY = canvas.height - 20;
+const basketWidth = 80;
+const basketHeight = 10;
+const basketSpeed = 20;
+
+// Falling object variables
+let fallingX = Math.random() * (canvas.width - 20);
+let fallingY = 0;
+const fallingSize = 20;
+const fallingSpeed = 4;
+
+// Score
+let score = 0;
+
+// Draw the basket
+function drawBasket() {
+  ctx.fillStyle = "blue";
+  ctx.fillRect(basketX, basketY, basketWidth, basketHeight);
+}
+
+// Draw the falling object
+function drawFallingObject() {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(fallingX, fallingY, fallingSize, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Update game
+function updateGame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw basket and falling object
+  drawBasket();
+  drawFallingObject();
+
+  // Move falling object
+  fallingY += fallingSpeed;
+
+  // Check collision
+  if (
+    fallingY + fallingSize >= basketY &&
+    fallingX >= basketX &&
+    fallingX <= basketX + basketWidth
+  ) {
+    score++;
+    fallingY = 0;
+    fallingX = Math.random() * (canvas.width - fallingSize);
+  }
+
+  // Reset if missed
+  if (fallingY > canvas.height) {
+    fallingY = 0;
+    fallingX = Math.random() * (canvas.width - fallingSize);
+  }
+
+  // Display score
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.fillText(`Score: ${score}`, 10, 20);
+
+  requestAnimationFrame(updateGame);
+}
+
+// Move basket
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowLeft" && basketX > 0) {
+    basketX -= basketSpeed;
+  } else if (event.key === "ArrowRight" && basketX < canvas.width - basketWidth) {
+    basketX += basketSpeed;
+  }
+});
+
+// Start the game
+updateGame();
+
+</script>
